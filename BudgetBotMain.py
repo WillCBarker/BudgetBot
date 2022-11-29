@@ -12,6 +12,8 @@ from dateutil import relativedelta
 1. compound interest addition later on
 2. USE PLOTLY, mutliple charts on single page capability
 3. Tax calculations, Scrape from web
+4. USE DASH?
+5. Save all budget info into csv, potentially on github as an api/json file - see IT 315 API pulling
 '''
 
 
@@ -146,7 +148,7 @@ class budget():
     def monthDifference(self, date):
         '''
         Uses datetime & relativedelta to find difference between 2 dates in months
-        @return Int
+        @return int
         '''
         today = datetime.now().strftime('%Y-%m-%d')
         date = date.strftime('%Y-%m-%d')

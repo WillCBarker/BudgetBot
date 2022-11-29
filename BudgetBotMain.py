@@ -5,7 +5,7 @@
 
 from datetime import datetime
 from dateutil import relativedelta
-
+from dash import Dash, dcc, html
 
 '''
 ******TO DO******
@@ -30,9 +30,10 @@ class budget():
         self.__moneyIn = 0
         self.__moneyOut = 0
         self.__moneyIdle = 0
-        self.__container = {'housing': self.__housing, 'food': self.__food, 'transportation': self.__transportation, 
-                            'insurance': self.__insurance, 'medical': self.__medical, 'utilities': self.__utilities, 
-                            'investments': self.__investments, 'recreational': self.__recreational}
+        self.__expenseContainer = {'expenseNames': ['housing', 'food', 'transportation', 'insurance', 'medical', 'utilities', 'investments', 'recreational'],
+                                    'expenses' : [self.__housing, self.__food,  self.__transportation, 
+                                                    self.__insurance, self.__medical,  self.__utilities, 
+                                                    self.__investments, self.__recreational]}
 
     def setMoneyIn(self, newMoneyIn):
         self.__moneyIn = newMoneyIn
@@ -45,35 +46,35 @@ class budget():
 
     def setHousing(self, newHousing):
         self.__housing = newHousing
-        self.__container['housing'] = self.__housing
+        self.__expenseContainer['expenses'][0] = self.__housing
 
     def setFood(self, newFood):
         self.__food = newFood
-        self.__container['food'] = self.__food
+        self.__expenseContainer['expenses'][1] = self.__food
 
     def setTransportation(self, newTransportation):
         self.__transportation = newTransportation
-        self.__container['transportation'] = self.__transportation
+        self.__expenseContainer['expenses'][2] = self.__transportation
 
     def setInsurance(self, newInsurance):
         self.__insurance = newInsurance
-        self.__container['insurance'] = self.__insurance
+        self.__expenseContainer['expenses'][3] = self.__insurance
 
     def setMedical(self, newMedical):
         self.__medical = newMedical
-        self.__container['medical'] = self.__medical
+        self.__expenseContainer['expenses'][4] = self.__medical
 
     def setUtilities(self, newUtilities):
         self.__utilities = newUtilities
-        self.__container['utilities'] = self.__utilities
+        self.__expenseContainer['expenses'][5] = self.__utilities
 
     def setInvestments(self, newInvestments):
         self.__investments = newInvestments
-        self.__container['investments'] = self.__investments
+        self.__expenseContainer['expenses'][6] = self.__investments
 
     def setRecreational(self, newRecreational):
         self.__recreational = newRecreational
-        self.__container['recreational'] = self.__recreational
+        self.__expenseContainer['expenses'][7] = self.__recreational
 
     def getMoneyIn(self):
         return self.__moneyIn
@@ -84,6 +85,9 @@ class budget():
     def getMoneyIdle(self):
         return self.__moneyIdle
 
+    def getExpenseContainer(self):
+        return self.__expenseContainer
+
     '''
     Methods directly associated with plotting below
     '''
@@ -93,7 +97,8 @@ class budget():
         Returns most costly category of budget
         @return int
         '''
-        return max(self.__container, key = self.__container.get) 
+        maxIndex = self.__expenseContainer['expenses'].index(max(self.__expenseContainer['expenses']))
+        return self.__expenseContainer['expenseNames'][maxIndex]
 
 
     def getTotalBudget(self):
@@ -101,7 +106,7 @@ class budget():
         Returns sum of all categories in budget
         @return int
         '''
-        return sum(self.__container.values())
+        return sum(self.__expenseContainer['expenses'])
 
     def getDiscretionaryIncome(self):
         '''
@@ -137,12 +142,16 @@ class budget():
 
     def projectMoney(self, date):
         '''
-        Shows where money will be at input future date
-        @return int
+        Shows where money will be at input future date based on budget, returning 2 lists - 1. monthly balance, 2. month count
+        @return List
         '''
         monthDiff = self.monthDifference(date)
-        moneyCompiled = self.getDiscretionaryIncome() * monthDiff
-        return moneyCompiled
+        monthlyBalance = []
+        monthCount = []
+        for i in range(monthDiff):
+            monthlyBalance.append(i*self.getDiscretionaryIncome())
+            monthCount.append(i)
+        return [monthCount, monthlyBalance]
 
 
     def monthDifference(self, date):
@@ -157,11 +166,22 @@ class budget():
         diff = relativedelta.relativedelta(end_date, start_date)
         return diff.months + (diff.years * 12)
 
+    def compoundInterest(self, end_date, percentGrowth):
+        '''
+        Calculates compound interest leveraging projectMoney method,
+        '''
+        profit = self.__investments
+        percentGrowth = percentGrowth/100
+        yearDiff = self.monthDifference(end_date)//12
+        profitTrack = []
+        yearCount = []
+        for i in range(yearDiff):
+            profit = profit * (1 + percentGrowth) + self.__investments
+            profitTrack.append(profit)
+            yearCount.append(i)
+        return [yearCount, profitTrack]
 
-
-
-
-
+''' --Test Code
 x = budget()
 x.setFood(500)
 x.setInsurance(300)
@@ -171,3 +191,4 @@ print("total Budget: ", x.getTotalBudget())
 print("Disc Income: ", x.getDiscretionaryIncome())
 futureDay = datetime(2024, 8, 30) #going to need time setting method for GUI
 x.projectMoney(futureDay)
+'''

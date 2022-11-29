@@ -7,6 +7,7 @@
 ******TO DO******
 1. compound interest addition later on
 2. USE PLOTLY, mutliple charts on single page capability
+3. Tax calculations, Scrape from web
 '''
     
 
@@ -77,6 +78,10 @@ class budget():
     def getMoneyIdle(self):
         return self.__moneyIdle
 
+    '''
+    Methods directly associated with plotting below
+    '''
+
     def getCostliestCategory(self):
         '''
         Returns most costly category of budget
@@ -97,7 +102,34 @@ class budget():
         Returns money available after all expenses paid
         @return int
         '''
-        return self.__moneyIn - self.getTotalBudget()
+        return self.netIncome() - self.getTotalBudget()
+
+    def netIncome(self):
+        '''
+        Calculates state and federal income tax rate given income.
+        Notes:
+            -State tax based on Virginia only 
+            -Federal tax based assumes single filing
+        @return int
+        '''
+        #State Tax brackets
+        if self.__moneyIn <= 3000: stateTax = 0.98
+        elif self.__moneyIn <= 50000: stateTax = 0.97
+        elif self.__moneyIn <= 17000: stateTax = 0.95
+        else: stateTax = 0.9425
+
+        #Federal Tax brackets
+        if self.__moneyIn <= 10275: federalTax = 0.10 * self.__moneyIn
+        elif self.__moneyIn <= 10276: federalTax = 1027.50 + (0.12 * (self.__moneyIn - 10275))
+        elif self.__moneyIn <= 41776: federalTax = 4807.50 + (0.22 * (self.__moneyIn - 41775))
+        elif self.__moneyIn <= 89076: federalTax = 15213.50 + (0.24 * (self.__moneyIn - 89075))
+        elif self.__moneyIn <= 170051: federalTax = 34647.50 + (0.32 * (self.__moneyIn - 170050))
+        elif self.__moneyIn <= 215951: federalTax = 49335.50 + (0.35 * (self.__moneyIn - 215950))
+        else: federalTax = 162718 + (0.37 * (self.__moneyIn - 539900))
+
+        return (self.__moneyIn * stateTax) - federalTax
+
+    
 
 
 
@@ -105,8 +137,8 @@ class budget():
 
 x = budget()
 x.setFood(500)
-x.setInsurance(79)
-x.setMoneyIn(750)
+x.setInsurance(300)
+x.setMoneyIn(95000)
 print("Costliest: ", x.getCostliestCategory())
 print("total Budget: ", x.getTotalBudget())
 print("Disc Income: ", x.getDiscretionaryIncome())

@@ -3,13 +3,17 @@
     #Describes where money will be at, what took the largest chunk between present date and set future date
 #shows dashboard of all information
 
+from datetime import datetime
+from dateutil import relativedelta
+
+
 '''
 ******TO DO******
 1. compound interest addition later on
 2. USE PLOTLY, mutliple charts on single page capability
 3. Tax calculations, Scrape from web
 '''
-    
+
 
 class budget():
     def __init__(self):
@@ -129,7 +133,28 @@ class budget():
 
         return (self.__moneyIn * stateTax) - federalTax
 
-    
+    def projectMoney(self, date):
+        '''
+        Shows where money will be at input future date
+        @return int
+        '''
+        monthDiff = self.monthDifference(date)
+        moneyCompiled = self.getDiscretionaryIncome() * monthDiff
+        return moneyCompiled
+
+
+    def monthDifference(self, date):
+        '''
+        Uses datetime & relativedelta to find difference between 2 dates in months
+        @return Int
+        '''
+        today = datetime.now().strftime('%Y-%m-%d')
+        date = date.strftime('%Y-%m-%d')
+        start_date = datetime.strptime(today, "%Y-%m-%d")
+        end_date = datetime.strptime(date, "%Y-%m-%d")
+        diff = relativedelta.relativedelta(end_date, start_date)
+        return diff.months + (diff.years * 12)
+
 
 
 
@@ -142,3 +167,5 @@ x.setMoneyIn(95000)
 print("Costliest: ", x.getCostliestCategory())
 print("total Budget: ", x.getTotalBudget())
 print("Disc Income: ", x.getDiscretionaryIncome())
+futureDay = datetime(2024, 8, 30) #going to need time setting method for GUI
+x.projectMoney(futureDay)

@@ -8,12 +8,9 @@ from dateutil import relativedelta
 from dash import Dash, dcc, html
 
 '''
-******TO DO******
-1. compound interest addition later on
-2. USE PLOTLY, mutliple charts on single page capability
-3. Tax calculations, Scrape from web
-4. USE DASH?
-5. Save all budget info into csv, potentially on github as an api/json file - see IT 315 API pulling
+Ideas:
+    - "What if" scenarios, investing in certain stocks, predict yield over time using api pulled avg 20 yr gain for ex.
+    - Initial questionaire using pyqt
 '''
 
 
@@ -115,7 +112,7 @@ class budget():
         '''
         return self.netIncome() - self.getTotalBudget()
 
-    def netIncome(self):
+    def getTax(self):
         '''
         Calculates state and federal income tax rate given income.
         Notes:
@@ -138,20 +135,37 @@ class budget():
         elif self.__moneyIn <= 215951: federalTax = 49335.50 + (0.35 * (self.__moneyIn - 215950))
         else: federalTax = 162718 + (0.37 * (self.__moneyIn - 539900))
 
+        return stateTax, federalTax
+
+    def netIncome(self):
+        '''
+        Calculates income after tax
+        @return int
+        '''
+        stateTax, federalTax = self.getTax()
         return (self.__moneyIn * stateTax) - federalTax
 
     def projectMoney(self, date):
         '''
-        Shows where money will be at input future date based on budget, returning 2 lists - 1. monthly balance, 2. month count
-        @return List
+        Shows where money will be at input future date based on budget, returning 2 lists - 1. monthly/yearly balance, 2. month/year count
+        @return list
         '''
-        monthDiff = self.monthDifference(date)
-        monthlyBalance = []
-        monthCount = []
-        for i in range(monthDiff):
-            monthlyBalance.append(i*self.getDiscretionaryIncome())
-            monthCount.append(i)
-        return [monthCount, monthlyBalance]
+        timeDiff = self.monthDifference(date)
+        if timeDiff > 12:
+            #if date is over 1 year in the future, plot by year instead of month
+            timeDiff = round(timeDiff/12) + 1
+            start = 1
+        else:
+            #A year and under, plots the single year since data is incremented by year
+            timeDiff = 2
+            start = 0
+
+        balance = []
+        count = []
+        for i in range(start, timeDiff):
+            balance.append(i*self.getDiscretionaryIncome())
+            count.append(i)
+        return [count, balance]
 
 
     def monthDifference(self, date):
@@ -168,7 +182,8 @@ class budget():
 
     def compoundInterest(self, end_date, percentGrowth):
         '''
-        Calculates compound interest leveraging projectMoney method,
+        Calculates compound interest based on input time frame and yield
+        @return list
         '''
         profit = self.__investments
         percentGrowth = percentGrowth/100

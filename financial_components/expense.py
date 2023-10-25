@@ -33,10 +33,12 @@ class Expense():
 
         return self.amount * frequency_dict[self.frequency]
         
+        
     def calculate_accrued_expense(self, start_date, end_date):
         """
         Calculates accrued expenses in a given time interval
         """
+        
         days = u.get_time_difference(start_date, end_date)
         frequency = self.convert_frequency_of_return()
         occurences_in_time_interval = u.get_occurences_in_time_interval(days, frequency)

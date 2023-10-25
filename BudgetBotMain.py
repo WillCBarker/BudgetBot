@@ -312,21 +312,17 @@ class Expense():
 
     def calculate_annual_amount(self):
         # TO BE REPLACED BY UTIL (shared with convert frequency of return)
-        if self.frequency == "daily":
-            return self.amount * 365
-        elif self.frequency == "weekly":
-            return self.amount * 52
-        elif self.frequency == "biweekly":
-            return self.amount * 26
-        elif self.frequency == "monthly":
-            return self.amount * 12
-        elif self.frequency == "quarterly":
-            return self.amount * 4
-        elif self.frequency == "semiannual":
-            return self.amount * 2
-        elif self.frequency == "annually":
-            return self.amount
-        
+        frequency_dict = {
+            "daily": 365,
+            "weekly": 52,
+            "biweekly": 26,
+            "monthly": 12,
+            "quarterly": 4,
+            "semiannual": 2,
+            "annually": 1
+        }
+
+        return self.amount * frequency_dict[self.frequency]
         
     def calculate_accrued_expense(self, start_date, end_date):
         days = u.get_time_difference(start_date, end_date)
@@ -376,20 +372,17 @@ class Investment():
         # NOTE: REPLACE THIS
         # With a util.py type method for every function to use for conversions (looking at you expenses)
 
-        if self.frequency_of_return == "daily":
-            return 365
-        elif self.frequency_of_return == "weekly":
-            return 52
-        elif self.frequency_of_return == "biweekly":
-            return 26
-        elif self.frequency_of_return == "monthly":
-            return 12
-        elif self.frequency_of_return == "quarterly":
-            return 4
-        elif self.frequency_of_return == "semiannual":
-            return 2
-        elif self.frequency_of_return == "annual":
-            return 1
+        frequency_dict = {
+            "daily": 365,
+            "weekly": 52,
+            "biweekly": 26,
+            "monthly": 12,
+            "quarterly": 4,
+            "semiannual": 2,
+            "annual": 1
+        }
+
+        return frequency_dict[self.frequency_of_return]
         
 
     def convert_expected_return(self):

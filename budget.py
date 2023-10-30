@@ -80,6 +80,9 @@ class Budget():
         return dates, investments_accrual
 
 
+    # ** PLOTTING BELOW **
+
+
     def plot_annual_expenses(self, start_date, end_date):
         dates, annual_expenses = self.generate_annual_expenses_data(start_date, end_date)
         fig = px.line(x=dates, y=annual_expenses, labels={'x': 'Year', 'y': 'Annual Expenses'})
@@ -93,10 +96,23 @@ class Budget():
 
 
 
+
+# Create test budget
 my_budget = Budget()
-# Add expenses and investments
 
-start_date = "2020-01-01"
-end_date = "2021-01-01"
+my_budget.add_cashflow(1200, "salary", "biweekly", "04-21-2023")
+my_budget.add_cashflow(130, "sidehustle", "monthly", "08-01-2023")
 
-my_budget.plot_annual_expenses(start_date, end_date)
+my_budget.add_expense("rent", 1000, "housing", "monthly" )
+my_budget.add_expense("gas", 200, "transportation", "monthly")
+my_budget.add_expense("netflix", 20, "recreation", "monthly")
+my_budget.add_expense("groceries", 200, "food", "biweekly")
+my_budget.add_expense("resturaunts", 50, "food", "biweekly")
+
+my_budget.add_investment(3000, 6, "annually", "stock")
+
+print(my_budget.cashflows[0].get_cashflow_list_since_date())
+
+#start_date = "2020-01-01"
+#end_date = "2021-01-01"
+#my_budget.plot_annual_expenses(start_date, end_date)

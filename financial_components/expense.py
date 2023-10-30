@@ -40,9 +40,10 @@ class Expense():
         """
         
         days = u.get_time_difference(start_date, end_date)
-        frequency = self.convert_frequency_of_return()
+        frequency = u.convert_frequency_of_return(self.frequency)
         occurences_in_time_interval = u.get_occurences_in_time_interval(days, frequency)
-
+        result = 0
+        
         for i in range(occurences_in_time_interval):
             result += self.amount
 

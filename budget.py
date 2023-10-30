@@ -3,9 +3,9 @@ from datetime import datetime
 from dateutil import relativedelta
 from dash import Dash, dcc, html
 from financial_components import Investment
-from financial_components import Cashflow
+from financial_components import Income
 from financial_components import Expense
-
+import sqlite3
 
 # TODO:
 # 1. Have multiple dash subplots in new GUI file
@@ -18,20 +18,37 @@ import plotly.express as px
 import pandas as pd
 
 class Budget():
-    def __init__(self):
+    def __init__(self, name, allocated_amount):
+        self.name = name
+        self.allocated_amount = allocated_amount
         self.expenses = []
-        self.cashflows = []
+        self.incomes = []
         self.investments = []
 
+
+    def save_to_database(self):
+        """ Inserts expense object into the database """
+        try:
+            conn = sqlite3.connect("financials.db")
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO budget (name, amount, category, frequency) VALUES (?, ?, ?, ?)
+            ''', (self.name, self.amount, self.description, self.frequency))
+            conn.commit()
+            print("Success!")
+        except sqlite3.Error as error:
+            print("Failed to insert expense object into table: ", error)
+        finally:
+            cursor.close()
 
     def add_expense(self, name, amount, category, frequency):
         new_expense = Expense(name, amount, category, frequency)
         self.expenses.append(new_expense)
 
 
-    def add_cashflow(self, amount, category, frequency, date):
-        new_cashflow = Cashflow(amount, category, frequency, date)
-        self.cashflows.append(new_cashflow)
+    def add_income(self, amount, category, frequency, date):
+        new_income = Income(amount, category, frequency, date)
+        self.incomes.append(new_income)
 
 
     def add_investment(self, amount, expected_return, frequency_of_return, category, maturity_date=None):
@@ -53,13 +70,13 @@ class Budget():
         return total
 
 
-    def calculate_net_annual_cashflows(self):
-        total_cashflows = 0
-        for cashflow in self.cashflows:
-            total_cashflows += cashflow.amount
+    def calculate_net_annual_incomes(self):
+        total_incomes = 0
+        for income in self.incomes:
+            total_incomes += income.amount
         total_expenses = self.calculate_total_annual_expenses()
         total_investments = self.calculate_total_annual_returns()
-        return total_cashflows - total_expenses + total_investments
+        return total_incomes - total_expenses + total_investments
     
 
     def generate_annual_expenses_data(self, start_date, end_date):
@@ -100,8 +117,8 @@ class Budget():
 # Create test budget
 my_budget = Budget()
 
-my_budget.add_cashflow(1200, "salary", "biweekly", "04-21-2023")
-my_budget.add_cashflow(130, "sidehustle", "monthly", "08-01-2023")
+my_budget.add_income(1200, "salary", "biweekly", "04-21-2023")
+my_budget.add_income(130, "sidehustle", "monthly", "08-01-2023")
 
 my_budget.add_expense("rent", 1000, "housing", "monthly" )
 my_budget.add_expense("gas", 200, "transportation", "monthly")
@@ -111,7 +128,7 @@ my_budget.add_expense("resturaunts", 50, "food", "biweekly")
 
 my_budget.add_investment(3000, 6, "annually", "stock")
 
-print(my_budget.cashflows[0].get_cashflow_list_since_date())
+print(my_budget.incomes[0].get_income_list_since_date())
 
 #start_date = "2020-01-01"
 #end_date = "2021-01-01"

@@ -1,20 +1,35 @@
 import util as u
-
+import sqlite3
 
 class Expense():
-    def __init__(self, name, amount, category, frequency):
+    def __init__(self, name, amount, description, frequency):
         """
         name: expense name, e.g. Electricity
         amount: expense amount, e.g. 200
-        category: expense category, e.g. utilities
+        description: description of expense
         frequency: frequency of expense charge, e.g. monthly
         """
 
         self.name = name
         self.amount = amount
-        self.category = category
+        self.description = description
         self.frequency = frequency
 
+
+    def save_to_database(self):
+        """ Inserts expense object into the database """
+        try:
+            conn = sqlite3.connect("financials.db")
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO expense (name, amount, description, frequency) VALUES (?, ?, ?, ?)
+            ''', (self.name, self.amount, self.description, self.frequency))
+            conn.commit()
+            print("Success!")
+        except sqlite3.Error as error:
+            print("Failed to insert expense object into table: ", error)
+        finally:
+            cursor.close()
 
     def calculate_annual_amount(self):
         """

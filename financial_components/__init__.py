@@ -1,3 +1,3 @@
 from .investment import Investment
-from .cashflow import Cashflow
+from .income import Income
 from .expense import Expense

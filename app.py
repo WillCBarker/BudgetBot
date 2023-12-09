@@ -6,7 +6,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 import pandas as pd
 
@@ -14,6 +14,7 @@ import datetime
 
 import util as u
 from financial_components import Expense
+from budget import Budget
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -200,7 +201,7 @@ tab2_content = html.Div([
                 html.Button("Add Balance", id="create_balance_btn", className="col_create_btn"),
                 ],
 
-                class_name="tab2_column"
+                class_name="tab2_column_top_row"
                 ),
 
 
@@ -226,13 +227,13 @@ tab2_content = html.Div([
                 dbc.RadioItems(
                     options=[
                         {"label": "Just this once", "value": 1},
-                        {"label": "Daily", "value": 2},
-                        {"label": "Weekly", "value": 3},
-                        {"label": "Biweekly", "value": 4},
-                        {"label": "Monthly", "value": 5},
-                        {"label": "Quarterly", "value": 6},
-                        {"label": "Semiannually", "value": 7},
-                        {"label": "Annually", "value": 8},
+                        {"label": "Daily", "value": "Daily"},
+                        {"label": "Weekly", "value": "Weekly"},
+                        {"label": "Biweekly", "value": "Biweekly"},
+                        {"label": "Monthly", "value": "Monthly"},
+                        {"label": "Quarterly", "value": "Quarterly"},
+                        {"label": "Semiannually", "value": "Semiannually"},
+                        {"label": "Annually", "value": "Annually"},
                     ],
                     id="income_freq",
                     value=1,
@@ -241,7 +242,7 @@ tab2_content = html.Div([
                 html.Button("Add Income", id="create_income_btn", className="col_create_btn"),
                 ],
 
-                class_name="tab2_column"
+                class_name="tab2_column_top_row"
                 ),
 
 
@@ -265,13 +266,13 @@ tab2_content = html.Div([
                 dbc.RadioItems(
                     options=[
                         {"label": "Just this once", "value": 1},
-                        {"label": "Daily", "value": 2},
-                        {"label": "Weekly", "value": 3},
-                        {"label": "Biweekly", "value": 4},
-                        {"label": "Monthly", "value": 5},
-                        {"label": "Quarterly", "value": 6},
-                        {"label": "Semiannually", "value": 7},
-                        {"label": "Annually", "value": 8},
+                        {"label": "Daily", "value": "Daily"},
+                        {"label": "Weekly", "value": "Weekly"},
+                        {"label": "Biweekly", "value": "Biweekly"},
+                        {"label": "Monthly", "value": "Monthly"},
+                        {"label": "Quarterly", "value": "Quarterly"},
+                        {"label": "Semiannually", "value": "Semiannually"},
+                        {"label": "Annually", "value": "Annually"},
                     ],
                     id="expense_freq",
                     value=1,
@@ -280,7 +281,7 @@ tab2_content = html.Div([
                 html.Button("Add Expense", id="create_expense_btn", className="col_create_btn"),
                 ],
 
-                class_name="tab2_column"
+                class_name="tab2_column_top_row"
                 ),
 
 
@@ -313,13 +314,13 @@ tab2_content = html.Div([
                 html.P("How often will this investment accrue?", className="col_question_label"),
                 dbc.RadioItems(
                     options=[
-                        {"label": "Daily", "value": 2},
-                        {"label": "Weekly", "value": 3},
-                        {"label": "Biweekly", "value": 4},
-                        {"label": "Monthly", "value": 5},
-                        {"label": "Quarterly", "value": 6},
-                        {"label": "Semiannually", "value": 7},
-                        {"label": "Annually", "value": 8},
+                        {"label": "Daily", "value": "Daily"},
+                        {"label": "Weekly", "value": "Weekly"},
+                        {"label": "Biweekly", "value": "Biweekly"},
+                        {"label": "Monthly", "value": "Monthly"},
+                        {"label": "Quarterly", "value": "Quarterly"},
+                        {"label": "Semiannually", "value": "Semiannually"},
+                        {"label": "Annually", "value": "Annually"},
                     ],
                     id="investment_freq",
                     value=1,
@@ -328,13 +329,56 @@ tab2_content = html.Div([
                 html.Button("Add Investment", id="create_investment_btn", className="col_create_btn"),
                 ],
 
-                class_name="tab2_column"
+                class_name="tab2_column_top_row"
                 ),
 
             
         ]),
+        dbc.Row([
+            dbc.Col([],class_name="tab2_column_bottom_row"), # fill with created budget objects
+            dbc.Col([html.Div(id='income-output-div')],class_name="tab2_column_bottom_row"), # fill with income objects
+            dbc.Col([html.Div(id='expense-output-div')],class_name="tab2_column_bottom_row"), # fill with expense objects
+            dbc.Col([],class_name="tab2_column_bottom_row") # fill with investment objects
+        ])
     ])
 ])
+
+""" Following functions take the add attribute prompts and insert them into the current budget DS"""
+B = Budget("my-budget", 10000)
+@app.callback(
+    Output('expense-output-div', 'children'),
+    [Input('create_expense_btn', 'n_clicks')],
+    [State('expense_name', 'value'),
+     State('expense_amount', 'value'),
+     State('expense_freq', 'value')]
+)
+def create_expense(n_clicks, name, amount, frequency):
+    if n_clicks:
+        if name and frequency and amount:
+            B.add_expense(amount=amount, name=name, frequency=frequency, category="test")
+        expenses = B.expenses
+        object_details = [html.P(f"Expense: Name={obj.name}, Amount={obj.amount}, Frequency={obj.frequency}") for obj in expenses]
+        return object_details
+
+
+@app.callback(
+    Output('income-output-div', 'children'),
+    [Input('create_income_btn', 'n_clicks')],
+    [State('income_name', 'value'),
+     State('income_amount', 'value'),
+     State('income_freq', 'value')]
+)
+def create_income(n_clicks, name, amount, frequency):
+    if n_clicks:
+        if name and frequency and amount:
+            B.add_income(amount=amount, name=name, frequency=frequency, date="07-15-2022")
+        incomes = B.incomes
+        object_details = [html.P(f"Income: Name={obj.source}, Amount={obj.amount}, Frequency={obj.frequency}") for obj in incomes]
+        return object_details
+
+
+
+
 
 # Renders page based on active tab selected
 @app.callback(Output("content", "children"), [Input("tabs", "active_tab")])

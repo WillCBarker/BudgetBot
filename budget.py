@@ -42,12 +42,12 @@ class Budget():
             cursor.close()
 
     def add_expense(self, name, amount, category, frequency):
-        new_expense = Expense(name, amount, category, frequency)
+        new_expense = Expense(name=name, amount=amount, category=category, frequency=frequency)
         self.expenses.append(new_expense)
 
 
-    def add_income(self, amount, category, frequency, date):
-        new_income = Income(amount, category, frequency, date)
+    def add_income(self, name, amount,  frequency, date):
+        new_income = Income(source=name, amount=amount,  frequency=frequency, date=date)
         self.incomes.append(new_income)
 
 
@@ -115,7 +115,7 @@ class Budget():
 
 
 # Create test budget
-my_budget = Budget()
+my_budget = Budget("TestBudget", 5000)
 
 my_budget.add_income(1200, "salary", "biweekly", "04-21-2023")
 my_budget.add_income(130, "sidehustle", "monthly", "08-01-2023")

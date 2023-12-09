@@ -4,6 +4,7 @@
 # Cashflow over time
 
 import dash
+import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash.dependencies import Input, Output
 
@@ -14,22 +15,47 @@ import datetime
 import util as u
 from financial_components import Expense
 
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-
-# Create a Dash application
-app = dash.Dash(__name__)
 
 # Define the layout of the app
 app_color = {"graph_bg": "#c2d1b4", "graph_line": "#a3b899"}
 
 app.layout = html.Div(
     [
+        dbc.Tabs(
+            [
+                dbc.Tab(
+                    label="Tab one",
+                    tab_id="tab-1",
+                    label_style={"color": "black"},
+                    active_tab_style={"background-color": "#4d6650"}
+                ),
+                dbc.Tab(
+                    label="Tab two",
+                    tab_id="tab-2",
+                    label_style={"color": "black"},
+                    active_tab_style={"color": "#4d6650"}
+                )
+            ],
+            id="tabs",
+            active_tab="tab-1",
+        ),
+        html.Div(html.P(id="content", className="p-4")),
+    ],
+)
+                    
+tab1_content = html.Div(
+    [
         # header
         html.Div(
             [
                 html.Div(
                     [
-                        html.H4("MY VERSION STARTING", className="app__header__title"),
+                        html.H4(
+                            "MY VERSION STARTING",
+                            className="app__header__title",
+                        ),
                         html.P(
                             "This app does some things",
                             className="app__header__title--grey",
@@ -45,20 +71,37 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(
-                            [html.H6("EXPENSE OG", className="graph__title")]
-                        ),
-                        dcc.Graph(
-                            id="expense-graph",
-                            figure=dict(
-                                layout=dict(
-                                    plot_bgcolor=app_color["graph_bg"],
-                                    paper_bgcolor=app_color["graph_bg"],
-                                )
-                            ),
-                            config={"responsive": True}
+                            [
+                                html.Div(
+                                    [
+                                        html.H6(
+                                            "EXPENSE OG",
+                                            className="graph__title",
+                                        )
+                                    ]
+                                ),
+                                dcc.Graph(
+                                    id="expense-graph",
+                                    figure=dict(
+                                        layout=dict(
+                                            plot_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
+                                            paper_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
+                                        )
+                                    ),
+                                    style={
+                                        "width": "100%",
+                                        "height": "100%",
+                                    },
+                                ),
+                            ],
+                            className="expense_container",
                         ),
                     ],
-                    className="two-thirds column expense_container",
+                    className="two-thirds graph__container",
                 ),
                 html.Div(
                     [
@@ -76,21 +119,25 @@ app.layout = html.Div(
                                     id="expense-graph1",
                                     figure=dict(
                                         layout=dict(
-                                            plot_bgcolor=app_color["graph_bg"],
-                                            paper_bgcolor=app_color["graph_bg"],
+                                            plot_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
+                                            paper_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
                                         )
                                     ),
                                 ),
                             ],
-                            className="graph__container first",
+                            className="one-third graph__container first",
                         ),
-
                         html.Div(
                             [
                                 html.Div(
                                     [
                                         html.H6(
-                                            "EXPENSE2", className="graph__title"
+                                            "EXPENSE2",
+                                            className="graph__title",
                                         )
                                     ]
                                 ),
@@ -98,16 +145,20 @@ app.layout = html.Div(
                                     id="expense-graph2",
                                     figure=dict(
                                         layout=dict(
-                                            plot_bgcolor=app_color["graph_bg"],
-                                            paper_bgcolor=app_color["graph_bg"],
+                                            plot_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
+                                            paper_bgcolor=app_color[
+                                                "graph_bg"
+                                            ],
                                         )
                                     ),
                                 ),
                             ],
-                            className="graph__container second",
+                            className="one-third graph__container second",
                         ),
                     ],
-                    className="one-third column bottom_right_box",
+                    className="bottom_right_box",
                 ),
             ],
             className="app__content",
@@ -116,12 +167,191 @@ app.layout = html.Div(
     className="app__container",
 )
 
+tab2_content = html.Div([
+    dbc.Container([
+        html.H1("Financial Tracker"),
+        html.Hr(),
+        dbc.Row([
+            dbc.Col([
+                html.H3("Add General Balance"), 
+                html.P("Enter Balance Name", className="col_question_label"),
+                dbc.Input(
+                    id='income_name', 
+                    placeholder='Ex. Checkings', 
+                    type='text',
+                    class_name="col_input"
+                    ),
+
+                html.P("Enter Stored Amount", className="col_question_label"),
+                dbc.Input(
+                    id='income_amount',
+                    placeholder='Ex: 12800', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+
+                html.P("Enter Yield Percentage", className="col_question_label"),
+                dbc.Input(
+                    id='investment_yield', 
+                    placeholder='Ex: 2%', 
+                    type='text', 
+                    class_name="col_input",
+                    ),
+                html.Button("Add Balance", id="create_balance_btn", className="col_create_btn"),
+                ],
+
+                class_name="tab2_column"
+                ),
+
+
+            dbc.Col([
+                html.H3("Add Income Source"), 
+                html.P("Enter Income Source Name", className="col_question_label"),
+                dbc.Input(
+                    id='income_name', 
+                    placeholder='Ex. Salary', 
+                    type='text',
+                    class_name="col_input"
+                    ),
+
+                html.P("Enter Income Amount", className="col_question_label"),
+                dbc.Input(
+                    id='income_amount',
+                    placeholder='Ex: 1700', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+
+                html.P("How often will this income be received?", className="col_question_label"),
+                dbc.RadioItems(
+                    options=[
+                        {"label": "Just this once", "value": 1},
+                        {"label": "Daily", "value": 2},
+                        {"label": "Weekly", "value": 3},
+                        {"label": "Biweekly", "value": 4},
+                        {"label": "Monthly", "value": 5},
+                        {"label": "Quarterly", "value": 6},
+                        {"label": "Semiannually", "value": 7},
+                        {"label": "Annually", "value": 8},
+                    ],
+                    id="income_freq",
+                    value=1,
+                    class_name="col_input",
+                    ),
+                html.Button("Add Income", id="create_income_btn", className="col_create_btn"),
+                ],
+
+                class_name="tab2_column"
+                ),
+
+
+                            dbc.Col([
+                html.H3("Add Expense"),
+                html.P("Enter Expense Name", className="col_question_label"),
+                dbc.Input(
+                    id='expense_name', 
+                    placeholder='Ex: Netflix', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+                html.P("Enter Expense Amount", className="col_question_label"),
+                dbc.Input(
+                    id='expense_amount', 
+                    placeholder='Ex: 20', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+                html.P("How often will this expense occur?", className="col_question_label"),
+                dbc.RadioItems(
+                    options=[
+                        {"label": "Just this once", "value": 1},
+                        {"label": "Daily", "value": 2},
+                        {"label": "Weekly", "value": 3},
+                        {"label": "Biweekly", "value": 4},
+                        {"label": "Monthly", "value": 5},
+                        {"label": "Quarterly", "value": 6},
+                        {"label": "Semiannually", "value": 7},
+                        {"label": "Annually", "value": 8},
+                    ],
+                    id="expense_freq",
+                    value=1,
+                    class_name="col_input",
+                ),
+                html.Button("Add Expense", id="create_expense_btn", className="col_create_btn"),
+                ],
+
+                class_name="tab2_column"
+                ),
+
+
+            dbc.Col([
+                html.H3("Add Investment"), 
+                html.P("Enter Investment Name", className="col_question_label"),
+                dbc.Input(
+                    id='investment_name', 
+                    placeholder='Ex: Apple Stock', 
+                    type='text',
+                    class_name="col_input"
+                    ),
+
+                html.P("Enter Investment Amount", className="col_question_label"),
+                dbc.Input(
+                    id='investment_amount', 
+                    placeholder='Ex: 6500', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+
+                html.P("Enter Investment Yield Percentage", className="col_question_label"),
+                dbc.Input(
+                    id='investment_yield', 
+                    placeholder='Ex: 4', 
+                    type='text', 
+                    class_name="col_input"
+                    ),
+
+                html.P("How often will this investment accrue?", className="col_question_label"),
+                dbc.RadioItems(
+                    options=[
+                        {"label": "Daily", "value": 2},
+                        {"label": "Weekly", "value": 3},
+                        {"label": "Biweekly", "value": 4},
+                        {"label": "Monthly", "value": 5},
+                        {"label": "Quarterly", "value": 6},
+                        {"label": "Semiannually", "value": 7},
+                        {"label": "Annually", "value": 8},
+                    ],
+                    id="investment_freq",
+                    value=1,
+                    class_name="col_input",
+                    ),
+                html.Button("Add Investment", id="create_investment_btn", className="col_create_btn"),
+                ],
+
+                class_name="tab2_column"
+                ),
+
+            
+        ]),
+    ])
+])
+
+# Renders page based on active tab selected
+@app.callback(Output("content", "children"), [Input("tabs", "active_tab")])
+def switch_tab(at):
+    if at == "tab-1":
+        return tab1_content
+    elif at == "tab-2":
+        return tab2_content
+    return html.P("This shouldn't ever be displayed...")
 
 
 @app.callback(
     Output("expense-graph", "figure"),
-    [Input("start-date", "date"),
-     Input("end-date", "date")]
+    [
+    Input("start-date", "date"),
+    Input("end-date", "date"),
+     ]
 )
 def plot_expenses(start_date, end_date):
     """ Plots accrued expenses on line graph """

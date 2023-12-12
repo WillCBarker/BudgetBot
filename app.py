@@ -173,8 +173,8 @@ tab2_content = html.Div([
         html.H1("Financial Tracker", className="tab2_title"),
         html.H4("Select Existing Budget"),
         dcc.Dropdown(
-                id='budget-dropdown',
-                options=[{'label': name, 'value': name} for name in created_budgets.keys()],
+                id="budget-dropdown",
+                options=[{"label": name, "value": name} for name in created_budgets.keys()],
                 value=None,
                 ),
         html.Hr(),
@@ -183,25 +183,25 @@ tab2_content = html.Div([
                 html.H3("Create New Budget"), 
                 html.P("Enter Budget Name", className="col_question_label"),
                 dbc.Input(
-                    id='balance_name', 
-                    placeholder='Ex. Checkings', 
-                    type='text',
+                    id="balance_name", 
+                    placeholder="Ex. Checkings", 
+                    type="text",
                     class_name="col_input"
                     ),
 
                 html.P("Enter Stored Amount", className="col_question_label"),
                 dbc.Input(
-                    id='balance_amount',
-                    placeholder='Ex: 12800', 
-                    type='text', 
+                    id="balance_amount",
+                    placeholder="Ex: 12800", 
+                    type="text", 
                     class_name="col_input"
                     ),
 
                 html.P("Enter Yield Percentage", className="col_question_label"),
                 dbc.Input(
-                    id='investment_yield_percentage', 
-                    placeholder='Ex: 2%', 
-                    type='text', 
+                    id="balance_yield_percentage", 
+                    placeholder="Ex: 2%", 
+                    type="text", 
                     class_name="col_input",
                     ),
                 html.Button("Create Budget", id="create_balance_btn", className="col_create_btn"),
@@ -215,17 +215,17 @@ tab2_content = html.Div([
                 html.H3("Add Income Source"), 
                 html.P("Enter Income Source Name", className="col_question_label"),
                 dbc.Input(
-                    id='income_name', 
-                    placeholder='Ex. Salary', 
-                    type='text',
+                    id="income_name", 
+                    placeholder="Ex. Salary", 
+                    type="text",
                     class_name="col_input"
                     ),
 
                 html.P("Enter Income Amount", className="col_question_label"),
                 dbc.Input(
-                    id='income_amount',
-                    placeholder='Ex: 1700', 
-                    type='text', 
+                    id="income_amount",
+                    placeholder="Ex: 1700", 
+                    type="text", 
                     class_name="col_input"
                     ),
 
@@ -256,16 +256,16 @@ tab2_content = html.Div([
                 html.H3("Add Expense"),
                 html.P("Enter Expense Name", className="col_question_label"),
                 dbc.Input(
-                    id='expense_name', 
-                    placeholder='Ex: Netflix', 
-                    type='text', 
+                    id="expense_name", 
+                    placeholder="Ex: Netflix", 
+                    type="text", 
                     class_name="col_input"
                     ),
                 html.P("Enter Expense Amount", className="col_question_label"),
                 dbc.Input(
-                    id='expense_amount', 
-                    placeholder='Ex: 20', 
-                    type='text', 
+                    id="expense_amount", 
+                    placeholder="Ex: 20", 
+                    type="text", 
                     class_name="col_input"
                     ),
                 html.P("How often will this expense occur?", className="col_question_label"),
@@ -295,25 +295,25 @@ tab2_content = html.Div([
                 html.H3("Add Investment"), 
                 html.P("Enter Investment Name", className="col_question_label"),
                 dbc.Input(
-                    id='investment_name', 
-                    placeholder='Ex: Apple Stock', 
-                    type='text',
+                    id="investment_name", 
+                    placeholder="Ex: Apple Stock", 
+                    type="text",
                     class_name="col_input"
                     ),
 
                 html.P("Enter Investment Amount", className="col_question_label"),
                 dbc.Input(
-                    id='investment_amount', 
-                    placeholder='Ex: 6500', 
-                    type='text', 
+                    id="investment_amount", 
+                    placeholder="Ex: 6500", 
+                    type="text", 
                     class_name="col_input"
                     ),
 
                 html.P("Enter Investment Yield Percentage", className="col_question_label"),
                 dbc.Input(
-                    id='investment_yield', 
-                    placeholder='Ex: 4', 
-                    type='text', 
+                    id="investment_yield", 
+                    placeholder="Ex: 4", 
+                    type="text", 
                     class_name="col_input"
                     ),
 
@@ -341,60 +341,85 @@ tab2_content = html.Div([
             
         ]),
         dbc.Row([
-            dbc.Col([html.Div(id='balance-output-div')],class_name="tab2_column_bottom_row"), # fill with created budget objects
-            dbc.Col([html.Div(id='income-output-div')],class_name="tab2_column_bottom_row"), # fill with income objects
-            dbc.Col([html.Div(id='expense-output-div')],class_name="tab2_column_bottom_row"), # fill with expense objects
-            dbc.Col([html.Div(id='investment-output-div')],class_name="tab2_column_bottom_row") # fill with investment objects
+            dbc.Col([html.Div(id="balance-output-div")],class_name="tab2_column_bottom_row"), # fill with created budget objects
+            dbc.Col([html.Div(id="income-output-div")],class_name="tab2_column_bottom_row"), # fill with income objects
+            dbc.Col([html.Div(id="expense-output-div")],class_name="tab2_column_bottom_row"), # fill with expense objects
+            dbc.Col([html.Div(id="investment-output-div")],class_name="tab2_column_bottom_row") # fill with investment objects
         ])
     ])
 ])
 
 """ Following functions take the add attribute prompts and insert them into the current budget DS"""
 
-
 @app.callback(
-    Output('balance-output-div', 'children'),
-    [Input('create_balance_btn', 'n_clicks')],
-    [State('balance_name', 'value'),
-     State('balance_amount', 'value'),
-     State('investment_yield_percentage', 'value')]
+    [Output("balance-output-div", "children"),
+     Output("balance_name", "value"),
+     Output("balance_amount", "value"),
+     Output("balance_yield_percentage", "value")],
+    [Input("budget-dropdown", "value"),
+     Input("create_balance_btn", "n_clicks")],
+    [State("balance_name", "value"),
+     State("balance_amount", "value"),
+     State("balance_yield_percentage", "value")]
 )
-def create_balance(n_clicks, name, amount, yield_percentage=None):
+def update_budget(value, n_clicks, name, amount, yield_percentage):
+    """ Updates budget display elements """
+    print("\n\n\nVAL:", value, "\n\n\n")
+    triggered_id = ctx.triggered_id
     if n_clicks:
-        if name not in created_budgets:
-            if name and amount and yield_percentage:
-                created_budgets[name] =  Budget(name=name, allocated_amount=amount, yield_percentage=yield_percentage)
-            object_details = [
-                html.P(f"Expense: Name={created_budgets[name].name}, Amount={created_budgets[name].allocated_amount}, Frequency={created_budgets[name].yield_percentage}")]
-            return object_details
+        if triggered_id == "create_balance_btn":
+            create_balance(name, amount, yield_percentage)
+        if not name:
+            name = value
+        return [html.P(f"Budget: Name={created_budgets[name].name}, Amount={created_budgets[name].allocated_amount}, Frequency={created_budgets[name].yield_percentage}")], "", "", ""
+    else:
+        return [], "", "", ""
     
+
+# @app.callback(
+#     Output("balance-output-div", "children"),
+#     [Input("create_balance_btn", "n_clicks")],
+#     [State("balance_name", "value"),
+#      State("balance_amount", "value"),
+#      State("investment_yield_percentage", "value")]
+# )
+def create_balance(name, amount, yield_percentage=None):
+    """ Creates budget object and saves in currently created budgets cache """
+    if name not in created_budgets:
+        if name and amount and yield_percentage:
+            created_budgets[name] =  Budget(name=name, allocated_amount=amount, yield_percentage=yield_percentage)
+
 
 @app.callback(
     Output("budget-dropdown", "options"),
     [Input("create_balance_btn", "n_clicks"),
-     Input("budget-dropdown", "value")]
+     Input("budget-dropdown", "value")],
+     prevent_initial_call=True
 )
 def update_budget_dropdown(n_clicks, value):
+    """ Updates budget dropdown menu """
     if n_clicks:
-        options = [{'label': name, 'value': name} for name in created_budgets.keys()]
+        options = [{"label": name, "value": name} for name in created_budgets.keys()]
         return options
     return []
-
+    
 
 @app.callback(
     [Output("expense-output-div", "children"),
-    Output('expense_name', 'value'),
-    Output('expense_amount', 'value'),
-    Output('expense_freq', 'value')],
+     Output("expense_name", "value"),
+     Output("expense_amount", "value"),
+     Output("expense_freq", "value")],
     [Input("budget-dropdown", "value"),
      Input("create_expense_btn", "n_clicks")],
-    [State('expense_name', 'value'),
-     State('expense_amount', 'value'),
-     State('expense_freq', 'value')]
+    [State("expense_name", "value"),
+     State("expense_amount", "value"),
+     State("expense_freq", "value")]
 )
 def update_expense(value, n_clicks, name, amount, frequency):
+    """ Updates expense display elements """
+
     triggered_id = ctx.triggered_id
-    print("\n\n\n\nTRIGGER ID: ", triggered_id, "\n\n\n\n")
+
     if n_clicks:
         current_budget = created_budgets[value]
         if triggered_id == "create_expense_btn":
@@ -405,23 +430,27 @@ def update_expense(value, n_clicks, name, amount, frequency):
         return [], "", "", ""
 
 def create_expense(name, amount, frequency, current_budget):
+    """ Creates and adds expense object to active budget """
     if name and frequency and amount:
         current_budget.add_expense(amount=amount, name=name, frequency=frequency, category="test")
 
 
 @app.callback(
-    [Output('income-output-div', 'children'),
-     Output('income_name', 'value'),
-     Output('income_amount', 'value'),
-     Output('income_freq', 'value')],
+    [Output("income-output-div", "children"),
+     Output("income_name", "value"),
+     Output("income_amount", "value"),
+     Output("income_freq", "value")],
     [Input("budget-dropdown", "value"),
-     Input('create_income_btn', 'n_clicks')],
-    [State('income_name', 'value'),
-     State('income_amount', 'value'),
-     State('income_freq', 'value')]
+     Input("create_income_btn", "n_clicks")],
+    [State("income_name", "value"),
+     State("income_amount", "value"),
+     State("income_freq", "value")]
 )
 def update_income(value, n_clicks, name, amount, frequency):
+    """ Updates income display elements """
+
     triggered_id = ctx.triggered_id
+    
     if n_clicks:
         current_budget = created_budgets[value]
         if triggered_id == "create_income_btn":
@@ -433,26 +462,29 @@ def update_income(value, n_clicks, name, amount, frequency):
 
 
 def create_income(name, amount, frequency, current_budget):
+    """ Creates and adds income object to active budget """
     if name and frequency and amount:
         current_budget.add_income(amount=amount, name=name, frequency=frequency, date="07-15-2022")
 
 
 @app.callback(
-    [Output('investment-output-div', 'children'),
-     Output('investment_name', 'value'),
-     Output('investment_amount', 'value'),
-     Output('investment_yield', 'value'),
-     Output('investment_freq', 'value')],
+    [Output("investment-output-div", "children"),
+     Output("investment_name", "value"),
+     Output("investment_amount", "value"),
+     Output("investment_yield", "value"),
+     Output("investment_freq", "value")],
     [Input("budget-dropdown", "value"),
-     Input('create_investment_btn', 'n_clicks')],
-    [State('investment_name', 'value'),
-     State('investment_amount', 'value'),
-     State('investment_yield', 'value'),
-     State('investment_freq', 'value'),]
+     Input("create_investment_btn", "n_clicks")],
+    [State("investment_name", "value"),
+     State("investment_amount", "value"),
+     State("investment_yield", "value"),
+     State("investment_freq", "value"),]
 )
 def update_investments(value, n_clicks, name, amount, roi, roi_frequency, description=None, maturity_date=None):
+    """ Updates investment display elements"""
+
     triggered_id = ctx.triggered_id
-    print("SUP")
+
     if n_clicks:
         current_budget = created_budgets[value]
         print(current_budget.investments)
@@ -470,6 +502,7 @@ def update_investments(value, n_clicks, name, amount, roi, roi_frequency, descri
 
 
 def create_investment(current_budget, name, amount, roi, roi_frequency, description=None, maturity_date=None):
+    """ Creates and adds investment object to active budget """
     if name and amount and roi and roi_frequency:
         current_budget.add_investment(name=name, amount = amount, roi=roi, roi_frequency=roi_frequency, description="test")
 
@@ -644,5 +677,5 @@ def plot_expenses(start_date, end_date):
     return fig
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run_server(debug=False)

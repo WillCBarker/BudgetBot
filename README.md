@@ -12,8 +12,11 @@ BudgetBot is a Python project designed to simplify the process of visualizing an
 
 - **Customization:** Tailor BudgetBot to your specific financial needs. Customize categories, set budget limits, and track your spending patterns.
 
-# Example Images of App
+## Example Images of App
+# Tab 1
 ![Tab 1](example_images/example_tab_1.png)
+
+# Tab 2
 ![Tab 2](example_images/example_tab_2.png)
 
 # Setup

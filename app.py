@@ -349,7 +349,11 @@ tab2_content = html.Div([
     ])
 ])
 
-""" Following functions take the add attribute prompts and insert them into the current budget DS"""
+
+
+""" The following functions take the add attribute prompts and insert them into the current budget DS"""
+
+
 
 @app.callback(
     [Output("balance-output-div", "children"),
@@ -364,7 +368,7 @@ tab2_content = html.Div([
 )
 def update_budget(value, n_clicks, name, amount, yield_percentage):
     """ Updates budget display elements """
-    print("\n\n\nVAL:", value, "\n\n\n")
+    
     triggered_id = ctx.triggered_id
     if n_clicks:
         if triggered_id == "create_balance_btn":
@@ -376,15 +380,16 @@ def update_budget(value, n_clicks, name, amount, yield_percentage):
         return [], "", "", ""
     
 
-# @app.callback(
-#     Output("balance-output-div", "children"),
-#     [Input("create_balance_btn", "n_clicks")],
-#     [State("balance_name", "value"),
-#      State("balance_amount", "value"),
-#      State("investment_yield_percentage", "value")]
-# )
+@app.callback(
+    Output("balance-output-div", "children"),
+    [Input("create_balance_btn", "n_clicks")],
+    [State("balance_name", "value"),
+     State("balance_amount", "value"),
+     State("investment_yield_percentage", "value")]
+)
 def create_balance(name, amount, yield_percentage=None):
     """ Creates budget object and saves in currently created budgets cache """
+    
     if name not in created_budgets:
         if name and amount and yield_percentage:
             created_budgets[name] =  Budget(name=name, allocated_amount=amount, yield_percentage=yield_percentage)
@@ -398,6 +403,7 @@ def create_balance(name, amount, yield_percentage=None):
 )
 def update_budget_dropdown(n_clicks, value):
     """ Updates budget dropdown menu """
+    
     if n_clicks:
         options = [{"label": name, "value": name} for name in created_budgets.keys()]
         return options
@@ -419,18 +425,17 @@ def update_expense(value, n_clicks, name, amount, frequency):
     """ Updates expense display elements """
 
     triggered_id = ctx.triggered_id
-
     if n_clicks:
         current_budget = created_budgets[value]
         if triggered_id == "create_expense_btn":
             create_expense(name, amount, frequency, current_budget)
-            
         return [html.P(f"Expense: Name={obj.name}, Amount={obj.amount}, Frequency={obj.frequency}") for obj in current_budget.expenses], "", "", ""
     else:
         return [], "", "", ""
 
 def create_expense(name, amount, frequency, current_budget):
     """ Creates and adds expense object to active budget """
+    
     if name and frequency and amount:
         current_budget.add_expense(amount=amount, name=name, frequency=frequency, category="test")
 
@@ -450,7 +455,6 @@ def update_income(value, n_clicks, name, amount, frequency):
     """ Updates income display elements """
 
     triggered_id = ctx.triggered_id
-    
     if n_clicks:
         current_budget = created_budgets[value]
         if triggered_id == "create_income_btn":
@@ -463,6 +467,7 @@ def update_income(value, n_clicks, name, amount, frequency):
 
 def create_income(name, amount, frequency, current_budget):
     """ Creates and adds income object to active budget """
+    
     if name and frequency and amount:
         current_budget.add_income(amount=amount, name=name, frequency=frequency, date="07-15-2022")
 
@@ -503,15 +508,21 @@ def update_investments(value, n_clicks, name, amount, roi, roi_frequency, descri
 
 def create_investment(current_budget, name, amount, roi, roi_frequency, description=None, maturity_date=None):
     """ Creates and adds investment object to active budget """
+    
     if name and amount and roi and roi_frequency:
         current_budget.add_investment(name=name, amount = amount, roi=roi, roi_frequency=roi_frequency, description="test")
 
 
+
 """ End of table insertion functions"""
+
+
 
 # Renders page based on active tab selected
 @app.callback(Output("content", "children"), [Input("tabs", "active_tab")])
 def switch_tab(at):
+    """ Switches current tab and embdedded content """
+    
     if at == "tab-1":
         return tab1_content
     elif at == "tab-2":
@@ -528,12 +539,11 @@ def switch_tab(at):
 )
 def plot_expenses(start_date, end_date):
     """ Plots accrued expenses on line graph """
+    
     # TODO: Plot all expenses on same chart, have option to seperate into seperate lines (1 for each expense)
     #       will need to group all expenses by some global frequency though
 
-    # Create an Expense object
     expense = Expense(name="Electricity", amount=200, category="utilities", frequency="monthly")
-    
     # REVISIT
     if not start_date:
         start_date="2023-01-01"
@@ -553,7 +563,6 @@ def plot_expenses(start_date, end_date):
         "Accrued Expense": expense_track,
     })
 
-    # Create the line graph
     fig = {
         "data": [
             {
@@ -571,111 +580,7 @@ def plot_expenses(start_date, end_date):
     }
 
     return fig
-
-
-@app.callback(
-    Output("expense-graph1", "figure"),
-    [Input("start-date1", "date"),
-     Input("end-date1", "date")]
-)
-def plot_expenses(start_date, end_date):
-    """ Plots accrued expenses on line graph """
-    # TODO: Plot all expenses on same chart, have option to seperate into seperate lines (1 for each expense)
-    #       will need to group all expenses by some global frequency though
-
-    # Create an Expense object
-    expense1 = Expense(name="Electricity", amount=200, category="utilities", frequency="monthly")
     
-    # REVISIT
-    if not start_date:
-        start_date="2023-01-01"
-    if not end_date:
-        end_date="2024-01-01"
-
-    start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-
-    day_count = u.get_time_difference(start_date, end_date)
-    frequency_int_annual = u.convert_frequency_of_return(expense1.frequency)
-    occurences = u.get_occurences_in_time_interval(day_count, frequency_int_annual)
-    expense_track = u.compound_occurences_in_list(expense1.amount, occurences)
-
-    df = pd.DataFrame({
-        "Date": pd.date_range(start=start_date, end=end_date, periods=occurences),
-        "Accrued Expense": expense_track,
-    })
-
-    # Create the line graph
-    fig = {
-        "data": [
-            {
-                "x": df["Date"],
-                "y": df["Accrued Expense"],
-                "type": "line",
-                "name": "Accrued Expense",
-            },
-        ],
-        "layout": {
-            "title": "Accrued Expense Over Time",
-            "xaxis": {"title": "Date"},
-            "yaxis": {"title": "Accrued Expense"},
-        },
-    }
-
-    return fig
-
-
-@app.callback(
-    Output("expense-graph2", "figure"),
-    [Input("start-date2", "date"),
-     Input("end-date2", "date")]
-)
-def plot_expenses(start_date, end_date):
-    """ Plots accrued expenses on line graph """
-    # TODO: Plot all expenses on same chart, have option to seperate into seperate lines (1 for each expense)
-    #       will need to group all expenses by some global frequency though
-
-    # Create an Expense object
-    expense1 = Expense(name="Electricity", amount=200, category="utilities", frequency="monthly")
-    
-    # REVISIT
-    if not start_date:
-        start_date="2023-01-01"
-    if not end_date:
-        end_date="2024-01-01"
-
-    start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-
-    day_count = u.get_time_difference(start_date, end_date)
-    frequency_int_annual = u.convert_frequency_of_return(expense1.frequency)
-    occurences = u.get_occurences_in_time_interval(day_count, frequency_int_annual)
-    expense_track = u.compound_occurences_in_list(expense1.amount, occurences)
-
-    df = pd.DataFrame({
-        "Date": pd.date_range(start=start_date, end=end_date, periods=occurences),
-        "Accrued Expense": expense_track,
-    })
-
-    # Create the line graph
-    fig = {
-        "data": [
-            {
-                "x": df["Date"],
-                "y": df["Accrued Expense"],
-                "type": "line",
-                "name": "Accrued Expense",
-            },
-        ],
-        "layout": {
-            "title": "Accrued Expense Over Time",
-            "xaxis": {"title": "Date"},
-            "yaxis": {"title": "Accrued Expense"},
-        },
-    }
-
-    return fig
-
 
 if __name__ == "__main__":
     app.run_server(debug=False)

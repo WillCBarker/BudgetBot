@@ -1,8 +1,3 @@
-# Balance over time
-# Investments compounding over time
-# Expenses over time
-# Cashflow over time
-
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc, Input, Output, State, ctx

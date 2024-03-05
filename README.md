@@ -16,13 +16,6 @@ BudgetBot is a Python project designed to simplify the process of visualizing an
 
 - BudgetBot is a work in progress, be wary of some hardcoded values that are currently present in the plotting sections for use in development.
 
-## Example Images of App
-### Tab 1
-![Tab 1](example_images/example_tab_1.png)
-
-### Tab 2
-![Tab 2](example_images/example_tab_2.png)
-
 # Setup
 
 1. **Clone the Repository:**
